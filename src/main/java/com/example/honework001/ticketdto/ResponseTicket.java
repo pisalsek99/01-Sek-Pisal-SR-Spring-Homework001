@@ -5,9 +5,7 @@ import lombok.Setter;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
-
 import java.time.Instant;
-
 @Getter
 @Setter
 @NoArgsConstructor

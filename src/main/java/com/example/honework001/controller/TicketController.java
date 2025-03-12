@@ -2,6 +2,7 @@ package com.example.honework001.controller;
 
 import com.example.honework001.model.entity.Ticket;
 import com.example.honework001.ticketdto.*;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -161,6 +162,25 @@ public class TicketController {
         );
         return ResponseEntity.ok(ResponseTicket.createSuccessResponse("Ticket updated successfully", ticketResponse));
     }
+
+
+    @PutMapping
+    public ResponseEntity<ResponseTicket<Void>> updatePaymentStatusForMultipleTickets(
+            @RequestBody UpdateStatus ticketUpdatePaymentStatusRequest) {
+        List<Integer> ticketIds = ticketUpdatePaymentStatusRequest.ticketIds();
+        Boolean newPaymentStatus = ticketUpdatePaymentStatusRequest.paymentStatus();
+        List<Integer> updatedTicketIds = tickets.stream()
+                .filter(ticket -> ticketIds.contains(ticket.getTicketId()))
+                .peek(ticket -> ticket.setPaymentStatus(newPaymentStatus))
+                .map(Ticket::getTicketId)
+                .toList();
+        if (updatedTicketIds.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ResponseTicket.createErrorResponse("No tickets found with the provided IDs", HttpStatus.NOT_FOUND));
+        }
+        return ResponseEntity.ok(ResponseTicket.createSuccessResponse("Payment status updated successfully for tickets: " + updatedTicketIds, null));
+    }
+
 
     private static Ticket getTicket(UpdateRequestTicket updateRequest, Optional<Ticket> ticketOptional) {
         Ticket ticket = ticketOptional.get();
